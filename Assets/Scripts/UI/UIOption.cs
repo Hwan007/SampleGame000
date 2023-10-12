@@ -1,39 +1,36 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public struct AudioVolume
-{
-    public float Master;
-    public float BGM;
-    public float Effect;
-    public float UI;
-}
 
 public class UIOption : UIBase
 {
-    private AudioVolume _Volume;
-    private AudioVolume _preVolume;
-
-    [Header("표시할 해상도 리스트")]
-    private List<CustomResolution> _ResolutionListForUI;
-    private List<Resolution> _ResolutionList = new List<Resolution>();
+    private DataManager SaveData { get => GameManager.Data; }
+    // Display Option
+    private CustomResolution[] _ResolutionList { get => SaveData.ResolutionArray; }
     private int _ResolutionIndex;
-    private Resolution _Resolution;
     private int _preResolutionIndex;
 
-    private List<Display> _OutputDisplayList;
+    private DisplayInfo[] displayInfos { get => SaveData.GetDisplayInfos(); }
     private int _OutputDisplayIndex;
-    private Display _OutputDisplay;
-    private Display _preOutputDisplay;
+    private int _preOutputDisplayIndex;
 
     private bool _FullScreenMode;
     private bool _preFullScreenMode;
 
+    // Sound Option
+    private AudioVolume _Volume;
+    private AudioVolume _preVolume;
+
+    // UI Option
+    private float _UISize;
+    private float _preUISize;
+    private float _FontSize;
+    private float _preFontSize;
+
+    // 변경 체크
     private bool _isChanged = false;
 
     [Header("Slider Prefab")]
@@ -42,6 +39,7 @@ public class UIOption : UIBase
     [SerializeField] GameObject _dropdownPrefab;
     [Header("Check Prefab")]
     [SerializeField] GameObject _checkboxPrefab;
+
 
     private Slider _MasterVolSlider;
     private TMP_Text _MasterVolTxt;
@@ -63,58 +61,13 @@ public class UIOption : UIBase
     {
         ActAtClose = actAtClose;
 
-        //_Volume.Master = DataManager.Instance.MasterVolume;
-        //_Volume.BGM = DataManager.Instance.BGMVolume;
-        //_Volume.Effect = DataManager.Instance.EffectVolume;
-        //_Volume.UI = DataManager.Instance.UIVolume;
-        //_Volume.Other = DataManager.Instance.OtherVolume;
+        _Volume.Master = SaveData.MasterVolume;
+        _Volume.BGM = SaveData.BGMVolume;
+        _Volume.Effect = SaveData.EffectVolume;
+        _Volume.UI = SaveData.UIVolume;
 
         _preVolume = _Volume;
 
-        foreach (var resol in _ResolutionListForUI)
-        {
-            //var item = new CustomResolution() { width = resol.width, height = resol.height };
-            //_ResolutionList.Add(item);
-        }
-
-        _Resolution = Screen.currentResolution;
-        _ResolutionIndex = _ResolutionList.FindIndex(x =>
-        {
-            if (x.width == _Resolution.width && x.height == _Resolution.height)
-                return true;
-            return false;
-        });
-        _preResolutionIndex = _ResolutionIndex;
-
-        _OutputDisplay = Display.main;
-        _preOutputDisplay = _OutputDisplay;
-        _OutputDisplayList = new List<Display>();
-        _OutputDisplayList.AddRange(Display.displays);
-        _OutputDisplayIndex = _OutputDisplayList.FindIndex(x =>
-        {
-            if (x.Equals(_OutputDisplay))
-                return true;
-            return false;
-        });
-
-        _FullScreenMode = Screen.fullScreen;
-        _preFullScreenMode = _FullScreenMode;
-
-        _ResolutionDropdown.ClearOptions();
-        foreach (var opt in _ResolutionList)
-        {
-            TMP_Dropdown.OptionData item = new TMP_Dropdown.OptionData();
-            item.text = $"{opt.width}x{opt.height}";
-            _ResolutionDropdown.options.Add(item);
-        }
-
-        _outputDisplayDropdown.ClearOptions();
-        foreach (var opt in _OutputDisplayList)
-        {
-            TMP_Dropdown.OptionData item = new TMP_Dropdown.OptionData();
-            item.text = $"{opt}";
-            _outputDisplayDropdown.options.Add(item);
-        }
 
         Refresh();
     }
@@ -141,16 +94,31 @@ public class UIOption : UIBase
 
     public void SaveOption()
     {
-        GameManager.Data.MasterVolume = _Volume.Master;
-        GameManager.Data.BGMVolume = _Volume.BGM;
-        GameManager.Data.EffectVolume = _Volume.Effect;
-        GameManager.Data.UIVolume = _Volume.UI;
+        // Display Option
+        SaveData.ActiveDisplay = _OutputDisplayIndex;
+        SaveData.CurrentResolutionIndex = _ResolutionIndex;
+        SaveData.IsFullScreen = _FullScreenMode;
 
-        _preVolume = _Volume;
         _preResolutionIndex = _ResolutionIndex;
-        _preOutputDisplay = _OutputDisplay;
+        _preOutputDisplayIndex = _OutputDisplayIndex;
         _preFullScreenMode = _FullScreenMode;
 
+        // Sound Option
+        SaveData.MasterVolume = _Volume.Master;
+        SaveData.BGMVolume = _Volume.BGM;
+        SaveData.EffectVolume = _Volume.Effect;
+        SaveData.UIVolume = _Volume.UI;
+
+        _preVolume = _Volume;
+
+        // UI Option
+        SaveData.UISize = _UISize;
+        SaveData.FontSizeMultiplier = _FontSize;
+
+        _preUISize = _UISize;
+        _preFontSize = _FontSize;
+
+        // Success message
         var ui = UIManager.ShowUI<UIPopup>();
         if (ui != null)
         {
@@ -166,23 +134,23 @@ public class UIOption : UIBase
         {
             _Volume = _preVolume;
 
-            _FullScreenMode = _preFullScreenMode;
-            SetResolution(_preResolutionIndex);
-            _ResolutionIndex = _ResolutionList.FindIndex(x =>
-            {
-                if (x.width == _Resolution.width && x.height == _Resolution.height)
-                    return true;
-                return false;
-            });
+            //_FullScreenMode = _preFullScreenMode;
+            //SetResolution(_preResolutionIndex);
+            //_ResolutionIndex = _ResolutionList.FindIndex(x =>
+            //{
+            //    if (x.width == _Resolution.width && x.height == _Resolution.height)
+            //        return true;
+            //    return false;
+            //});
 
-            _OutputDisplay = _preOutputDisplay;
-            _OutputDisplayIndex = _OutputDisplayList.FindIndex(x =>
-            {
-                if (x.Equals(_preOutputDisplay))
-                    return true;
-                return false;
-            });
-            SetTargetDisplay(_OutputDisplayIndex);
+            //_OutputDisplay = _preOutputDisplay;
+            //_OutputDisplayIndex = _OutputDisplayList.FindIndex(x =>
+            //{
+            //    if (x.Equals(_preOutputDisplay))
+            //        return true;
+            //    return false;
+            //});
+            //SetTargetDisplay(_OutputDisplayIndex);
         }
         else
             SelfCloseUI();
@@ -225,9 +193,9 @@ public class UIOption : UIBase
 
     public void SetResolution(int index)
     {
-        Resolution resolution = _ResolutionList[index];
-        Screen.SetResolution(resolution.width, resolution.height, _FullScreenMode);
-        _Resolution = resolution;
+        //Resolution resolution = _ResolutionList[index];
+        //Screen.SetResolution(resolution.width, resolution.height, _FullScreenMode);
+        //_Resolution = resolution;
         _isChanged = true;
     }
 
@@ -238,7 +206,7 @@ public class UIOption : UIBase
             isFullScreen = true;
         else
             isFullScreen = false;
-        Screen.SetResolution(_Resolution.width, _Resolution.height, isFullScreen);
+        //Screen.SetResolution(_Resolution.width, _Resolution.height, isFullScreen);
         _FullScreenMode = isFullScreen;
         _isChanged = true;
     }

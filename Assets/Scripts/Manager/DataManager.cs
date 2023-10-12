@@ -66,7 +66,8 @@ public class DataManager
 
     [Header("Defalut Display Options")]
     [SerializeField] private int _activeDisplay;
-    [SerializeField] private List<CustomResolution> customResolutions;
+    [SerializeField] private List<CustomResolution> _customResolutions;
+    [SerializeField] private CustomResolution _currentResolution;
     [SerializeField] private bool _isFullScreen;
     /// <summary>
     /// Camera.main의 target display만 바꿀뿐이므로 주의!!
@@ -92,6 +93,8 @@ public class DataManager
             return Display.displays.Length;
         }
     }
+    public CustomResolution[] ResolutionArray { get => _customResolutions.ToArray(); }
+    public int CurrentResolutionIndex { get => _customResolutions.FindIndex(x => x == _currentResolution); set => _currentResolution = _customResolutions[value]; }
     public bool IsFullScreen { get => _isFullScreen; set => _isFullScreen = value; }
     /// <summary>
     /// Linux, maxOS, Windows만 지원하므로 주의!!
