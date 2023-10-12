@@ -68,8 +68,9 @@ public class UIOption : UIBase
 
         _preVolume = _Volume;
 
+        // TODO
 
-        Refresh();
+        //Refresh();
     }
 
     public override void Refresh()

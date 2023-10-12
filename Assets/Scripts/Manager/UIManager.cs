@@ -25,7 +25,24 @@ public class UIManager
 
     public float UISize { get => GameManager.Data.UISize; }
     public float FontSize { get => GameManager.Data.FontSizeMultiplier; }
-    public float UIRemainTime { get =>  GameManager.Data.UIRemainTime; }
+    public float UIRemainTime { get => GameManager.Data.UIRemainTime; }
+    private Canvas _canvas;
+    public Canvas UIRoot
+    {
+        get
+        {
+            if (_canvas == null)
+                if (GameObject.Find("_UI").TryGetComponent(out _canvas))
+                    return _canvas;
+                else
+                    return null;
+            return _canvas;
+        }
+        set
+        {
+            _canvas = value;
+        }
+    }
 
     public UIManager()
     {
@@ -72,9 +89,9 @@ public class UIManager
         if (open != null)
         {
             Instance.HideList.Remove(open);
-            //if (root == null)
-                //open.transform.SetParent(GameManager.Instance.UICanvas.transform);
-            //else
+            if (root == null)
+                open.transform.SetParent(Instance.UIRoot.transform);
+            else
                 open.transform.SetParent(root);
 
             open.gameObject.SetActive(true);
@@ -88,9 +105,9 @@ public class UIManager
         if (prefab != null)
         {
             GameObject obj;
-            //if (root == null)
-                //obj = GameObject.Instantiate(prefab, GameManager.Instance.UICanvas.transform);
-            //else
+            if (root == null)
+                obj = GameObject.Instantiate(prefab, Instance.UIRoot.transform);
+            else
                 obj = GameObject.Instantiate(prefab, root);
             var uiClass = obj.GetComponent<UIBase>();
 
@@ -297,7 +314,7 @@ public class UIManager
 
     private void LoadUIPrefab(string name)
     {
-        var obj = Resources.Load<GameObject>("Prefabs/UI/"+name);
+        var obj = Resources.Load<GameObject>("Prefabs/UI/" + name);
         if (obj != null)
         {
             var type = obj.GetComponent<UIBase>().GetType();
