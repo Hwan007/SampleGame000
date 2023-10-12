@@ -36,22 +36,28 @@ public class UIOption : UIBase
 
     private bool _isChanged = false;
 
-    [Header("각 옵션별 component")]
-    [SerializeField] private Slider _MasterVolSlider;
-    [SerializeField] private TMP_Text _MasterVolTxt;
+    [Header("Slider Prefab")]
+    [SerializeField] GameObject _sliderPrefab;
+    [Header("Dropdown Prefab")]
+    [SerializeField] GameObject _dropdownPrefab;
+    [Header("Check Prefab")]
+    [SerializeField] GameObject _checkboxPrefab;
 
-    [SerializeField] private Slider _BGMVolSlider;
-    [SerializeField] private TMP_Text _BGMVolTxt;
+    private Slider _MasterVolSlider;
+    private TMP_Text _MasterVolTxt;
 
-    [SerializeField] private Slider _EffectVolSlider;
-    [SerializeField] private TMP_Text _EffectVolTxt;
+    private Slider _BGMVolSlider;
+    private TMP_Text _BGMVolTxt;
 
-    [SerializeField] private Slider _UIVolSlider;
-    [SerializeField] private TMP_Text _UIVolTxt;
+    private Slider _EffectVolSlider;
+    private TMP_Text _EffectVolTxt;
 
-    [SerializeField] private TMP_Dropdown _ResolutionDropdown;
-    [SerializeField] private TMP_Dropdown _outputDisplayDropdown;
-    [SerializeField] private TMP_Dropdown _DisplayMode;
+    private Slider _UIVolSlider;
+    private TMP_Text _UIVolTxt;
+
+    private TMP_Dropdown _ResolutionDropdown;
+    private TMP_Dropdown _outputDisplayDropdown;
+    private TMP_Dropdown _DisplayMode;
 
     public void Initialize(Action actAtClose)
     {

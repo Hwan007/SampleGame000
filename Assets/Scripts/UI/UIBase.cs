@@ -8,7 +8,7 @@ public class UIBase : MonoBehaviour
 {
     [Header("최상위 RectTransform을 지정할 것.")]
     [SerializeField] protected RectTransform _self;
-    [Header("Size Options")]
+    [Header("Size Options\n(0:title, 1:description)")]
     [SerializeField] protected float[] _baseFontSize;
     protected Action ActAtHide;
     protected Action ActAtClose;
